@@ -6,15 +6,17 @@ import { usePathname } from "next/navigation"
 import { ElementRef, useRef, useState, useEffect } from "react"
 import { useMediaQuery } from "usehooks-ts"
 import UserItem from "./UserItem"
-import { useQuery } from "convex/react"
+import { useQuery, useMutation } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import Item from "./Item"
+import { toast } from "sonner"
 
 const Navigation = () => {
 
    const pathname = usePathname()
    const isMobile = useMediaQuery("(max-width: 768px)")
    const documents = useQuery(api.documents.get)
+   const create = useMutation(api.documents.create)
 
    const isResizingRef = useRef(false)
    const sidebarRef = useRef<ElementRef<"aside">>(null)
@@ -90,6 +92,16 @@ const Navigation = () => {
     }
    }
 
+   const handleCreate = () => {
+    const promise = create({ title: "Untitled" })
+
+    toast.promise(promise, {
+      loading: "Creating a new note...",
+      success: "New note created!",
+      error: "Failed to create new note."
+    })
+   }
+
   return (
     <>
      <aside ref={sidebarRef} className={cn("group/sidebar h-full bg-secondary overflow-y-auto relative flex w-60 flex-col z-[99999]", isResetting && "transition-all ease-in-out duration-300", isMobile && "w-0")}>
@@ -98,7 +110,7 @@ const Navigation = () => {
         </div>
       <div>
         <UserItem/>
-        <Item onClick={() => {}} label="New page" icon={PlusCircle}/>
+        <Item onClick={handleCreate} label="New page" icon={PlusCircle}/>
       </div>
       <div className="mt-4">
         {documents?.map((document) =>(
