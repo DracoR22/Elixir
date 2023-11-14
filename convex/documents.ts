@@ -208,6 +208,7 @@ export const remove = mutation({
     }
 })
 
+//--------------------------------------//GET DOCUMENTS FROM SEARCH BAR//----------------------------------//
 export const getSearch = query({
     handler: async (ctx) => {
         const identity = await ctx.auth.getUserIdentity()
@@ -228,6 +229,7 @@ export const getSearch = query({
     }
 })
 
+//--------------------------------------------//GET DOCUMENT BY ID//--------------------------------------//
 export const getById = query({
     args: { documentId: v.id("documents")},
     handler: async (ctx, args) => {
@@ -257,6 +259,7 @@ export const getById = query({
     }
 })
 
+//---------------------------------------------//UPDATE DOCUMENT//---------------------------------------//
 export const update = mutation({
     args: {
         id: v.id("documents"),
@@ -289,6 +292,66 @@ export const update = mutation({
 
         const document = await ctx.db.patch(args.id, {
             ...rest
+        })
+
+        return document
+    }
+})
+
+//-----------------------------------------------//DELETE ICON//-----------------------------------------//
+export const removeIcon = mutation({
+    args: { id: v.id("documents")},
+    handler: async (ctx, args) => {
+        const identity = await ctx.auth.getUserIdentity()
+
+        if(!identity) {
+            throw new Error("Not authenticated")
+        }
+
+        const userId = identity.subject
+
+        const existingDocument = await ctx.db.get(args.id)
+
+        if(!existingDocument) {
+            throw new Error("Not found")
+        }
+
+        if(existingDocument.userId !== userId) {
+            throw new Error("Unauthorized")
+        }
+
+        const document = await ctx.db.patch(args.id, {
+            icon: undefined
+        })
+
+        return document
+    }
+})
+
+//----------------------------------------------//DELETE IMAGE//-----------------------------------------//
+export const removeCoverImage = mutation({
+    args: { id: v.id("documents")},
+    handler: async (ctx, args) => {
+        const identity = await ctx.auth.getUserIdentity()
+
+        if(!identity) {
+            throw new Error("Not authenticated")
+        }
+
+        const userId = identity.subject
+
+        const existingDocument = await ctx.db.get(args.id)
+
+        if(!existingDocument) {
+            throw new Error("Not found")
+        }
+
+        if(existingDocument.userId !== userId) {
+          throw new Error("Unauthorized")
+        }
+
+        const document = await ctx.db.patch(args.id, {
+            coverImage: undefined
         })
 
         return document

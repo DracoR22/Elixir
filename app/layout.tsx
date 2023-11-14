@@ -5,6 +5,7 @@ import { ThemeProvider } from '@/components/providers/ThemeProvider'
 import { ConvexClientProvider } from '@/components/providers/ConvexProvider'
 import { Toaster } from 'sonner'
 import ModalProvider from '@/components/providers/ModalProvider'
+import { EdgeStoreProvider } from '@/lib/edgestore'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -36,11 +37,13 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className}`}>
         <ConvexClientProvider>
+          <EdgeStoreProvider>
         <ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange storageKey='elixir-theme'>
-          <Toaster position='bottom-center'/>
+          <Toaster position='bottom-right' richColors/>
           <ModalProvider/>
           {children}
         </ThemeProvider>
+        </EdgeStoreProvider>
         </ConvexClientProvider>
       </body>
     </html>
